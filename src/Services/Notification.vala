@@ -42,7 +42,11 @@ public class Services.Notification : GLib.Object {
             reminders.clear ();
         }
 
-        foreach (var reminder in Services.Store.instance ().reminders) {
+        // reminder_added () deletes overdue reminders from the store, so
+        // iterating the live list mutates it mid-loop and can crash.
+        var snapshot = new Gee.ArrayList<Objects.Reminder> ();
+        snapshot.add_all (Services.Store.instance ().reminders);
+        foreach (var reminder in snapshot) {
             reminder_added (reminder);
         }
 
